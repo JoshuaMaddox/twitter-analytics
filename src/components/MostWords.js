@@ -54,18 +54,7 @@ export default class MostWords extends Component {
 
   submit(){
     let {addWords,removeWords} = this.state
-    console.log(addWords)
-    console.log(removeWords)
     WordsActions.trainWords(addWords,removeWords);
-    //<div className='chart'>
-      //          <div onClick={this.removeWord.bind(null,word)}>
-      //            <div className='percent' id={percent.toString()} style={myWidth}>
-       //             {word} || Freq:{frequency[word]}
-                    
-       //           </div>
-       //         </div>
-       //         <p onClick={this.addWord.bind(null,word,frequency[word])} className='deleteBtn'>x</p>
-       //       </div>
   }
 
 
@@ -77,13 +66,22 @@ export default class MostWords extends Component {
     let firstNum
     if(mostWords) {
       mostUsedWords = mostWords.map((word, i, a) => {
-          firstNum = (i === 0) ? frequency[word] : firstNum
-          let percent = Math.floor((parseInt(frequency[word]) / parseInt(firstNum)) * 100)
-          let myWidth = {
+          
+
+          // console.log("I am firstNum: ", firstNum)
+          
+          // console.log('I am percent!!!!!!: ', percent)
+            
+          if(word !== ""){
+            firstNum = (i === 0) ? frequency[word] : firstNum
+            let percent = Math.floor((parseInt(frequency[word]) / parseInt(firstNum)) * 100)
+            let myWidth = {
             width: `${percent}%`,
             color: '#fff'
-          }  
-          if(i < 26){
+            }
+            console.log('firstNum: ', firstNum)
+            console.log('I am frequency[word]', frequency[word])
+            console.log('percent', percent)
             return (
             <div className="progressHolder" key={uuid()}>
               <div className="ui progress">
@@ -92,19 +90,19 @@ export default class MostWords extends Component {
                 </div>
                 <div className="label">
                 {word} {frequency[word]} 
-                <div className="ui vertical animated button addBtn" tabIndex="1">
-                  <div className="hidden content" onClick={this.addWord.bind(null,word,frequency[word])}>Add</div>
-                  <div className="visible content">
-                    <i className="lab icon"></i>
-                  </div>
-                </div>
-                <div className="ui vertical animated red tiny button addBtn" tabIndex="1">
-                  <div className="hidden content" onClick={this.removeWord.bind(null,word)}>Word</div>
-                  <div className="visible content">
-                    Remove
-                  </div>
-                </div>
-              </div>
+                    <div className="ui vertical animated button addBtn" tabIndex="1">
+                      <div className="hidden content" onClick={this.addWord.bind(null,word,frequency[word])}>Add</div>
+                        <div className="visible content">
+                          <i className="lab icon"></i>
+                        </div>
+                    </div>
+                    <div className="ui vertical animated red tiny button addBtn" tabIndex="1">
+                      <div className="hidden content" onClick={this.removeWord.bind(null,word)}>Word</div>
+                      <div className="visible content">
+                        Remove
+                      </div>
+                    </div>
+                 </div>
             </div>
           </div>
           )  

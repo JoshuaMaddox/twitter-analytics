@@ -13,8 +13,7 @@ export default class Form extends Component {
     e.preventDefault()
     const { input } = this.refs
     let term = input.value
-    ToAPIActions.sendTerm(term)
-    console.log('I am term in Form.js: ', term)
+    ToAPIActions.turnOn(term)
   }
 
   render() {
@@ -24,6 +23,7 @@ export default class Form extends Component {
     return (
       <div>
         <h2 className="ui header">
+        
           <i className="hashtag icon"></i>
           <div className="content">
             Search by Hashtag
@@ -32,15 +32,16 @@ export default class Form extends Component {
         </h2>
         <div className="ui action input" style={marginL}>
           <form onSubmit={this.submitSearchTerm}>
-            <input ref="input" type="text" placeholder="Search..."/>
+            <input ref="input" type="text" placeholder="Search..." required/>
             <button className="ui button">Search</button>
           </form>
         </div>
         <div className="ui buttons">
-          <Link to="/mostwords" className="ui button">Word Frequency</Link>
+          <Link to="/streamingTweet" className="ui button">Stream</Link>
           <div className="or"></div>
           <Link to="/graph" className="ui positive button">Graph</Link>
         </div>
+
       </div>
 
     )

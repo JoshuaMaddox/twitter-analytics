@@ -26,7 +26,7 @@ exports.makeTextObj = function(cb) {
       try{
         var data = JSON.parse(buffer)
         data.statuses.forEach((tweet) => {
-          tweetsArray = [...tweetsArray,...tweet.text.replace(/\W/g, ' ').split(' ')]
+          tweetsArray = [...tweetsArray,...tweet.text.split(' ')]
         })
         tweetsArray.forEach((word, i, a) => {
           word = word.toLowerCase()
@@ -38,6 +38,7 @@ exports.makeTextObj = function(cb) {
         })
         // console.log("I am wordsObj: ", wordsObj)
         let objSorted = Object.keys(wordsObj).sort(function(a,b){return wordsObj[b]- wordsObj[a]})
+        
         cb(null, objSorted, wordsObj)
       } catch(e) {
         console.log(e)

@@ -8,10 +8,12 @@ const router = express.Router()
 router.get('/', (req, res) => {
   let term = decodeURIComponent(req.query.term)
   let dataObj = {};
-  console.log('term!!!!!: ', term)
+  
   Twitter.gather(term, (err, termResults) => {
     dataObj.twitter = termResults;
+    // console.log('termResults: ', termResults)
     IDM.makeTextObj((err, wordList, textObj) =>{
+      console.log('wordList: ', wordList)
       dataObj.wordFreq = wordList;
       dataObj.wordObj = textObj;
       Twitter.watson((err, watsonRes) => {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 let LineChart = require("react-chartjs").Line;
 import DataStore from '../stores/DataStore'
+import ToAPIActions from '../actions/ToAPIActions'
  
 
 export default class Graph extends Component {
@@ -35,7 +36,8 @@ export default class Graph extends Component {
     // let color = '#561289'
     // let testNums = [10, 14, 34, 34, 56, 67, 89, 34]
     let {mostWords, frequency} = this.state
-    let data = mostWords.map((cur,i) => {if(i < 20) return frequency[cur] })
+    let data = []
+    mostWords.forEach((cur,i) => {if(i < 20) data.push(frequency[cur]) })
     let list = mostWords.filter((cur,i) => {if(i < 20) return true })
     console.log(list)
     // console.log('I am data: ', data)
@@ -61,7 +63,7 @@ export default class Graph extends Component {
             datasets: [{
                 label: 'Dataset 1',
                 backgroundColor: "rgba(220,220,220,0.5)",
-                data: data
+                data: data.sort((a,b) => a - b )
             }]
 
       }

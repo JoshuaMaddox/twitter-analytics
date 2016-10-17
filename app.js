@@ -11,9 +11,20 @@ const PORT = 8000,
       webpackHotMiddleware = require('webpack-hot-middleware'),
       InternalDataManagement = require('./models/InternalDataManagement');
 
-//Express invocation
-const app = express()
 require('dotenv').config({ silent: true })
+let socketEmit;
+const app = express()
+
+var server = require('http').Server(app)
+var io = require('socket.io')(server)
+//Express invocation
+
+console.log('console.log right before io.on: ');
+io.on('connection', (socket) => {
+  console.log('SOCKET ON');
+  socketEmit = (type, data) => socket.emit(type, data);
+})
+server.listen(PORT)
 
 //Middleware
 app.use(cors())
@@ -21,10 +32,14 @@ app.use(morgan('dev'))
 app.use(express.static('build'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-// app.use((req, res, next) => {
-//   res.handle = (err, data) => res.status(err ? 400 : 200).send(err || data);
-//   next();
-// })
+app.use((req, res, next) => {
+  res.handle = (err, data) => res.status(err ? 400 : 200).send(err || data);
+  next();
+})
+app.use((req, res, next) => {
+  res.socketEmitter = socketEmit;
+  next();
+})
 
 //Webpack Configuration
 const compiler = webpack(webpackConfig)
@@ -33,9 +48,12 @@ app.use(webpackDevMiddleware(compiler, {
 }))
 app.use(webpackHotMiddleware(compiler))
 
-app.use('/search', require('./routes/search'))
+app.get('/search', (req, res) => Twitter.twitterMap(req,res,res.handle))
 
-app.get('/streaming', (req, res) => Twitter.twitterMap(res.handle))
+// app.use('/search', require('./routes/search'))
+
+
+
 
 // app.get('/twitter', (req, res) => Twitter.gather(res.handle))
 
@@ -52,9 +70,9 @@ app.use("*", function(request,response) {
   response.sendFile(path.join(__dirname, "./build/index.html"))
 })
 
-app.listen(PORT, err => {
-  console.log( err || `Express listening on port ${8000}`)
-})
+// app.listen(PORT, err => {
+//   console.log( err || `Express listening on port ${8000}`)
+// })
 
 
 // const TMClient = require('textmagic-rest-client');

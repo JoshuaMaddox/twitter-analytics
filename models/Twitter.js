@@ -23,12 +23,7 @@ var tone_analyzer = watson.tone_analyzer({
   version_date: '2016-05-19'
 });
 
-var string = 'javascript',
-    antiString = 'shitty song, wack, sucks, suck, bad, music, terrible',
-    counter = 0,
-    countLimit = 100,
-    tweetStrs = [],
-    tweetObjs = [];
+
 
 //locations: '-122.75,36.8,-121.75,37.8,-74,40,-73,41'
 exports.gather = (term, cb) => {
@@ -65,8 +60,7 @@ exports.watson = function(cb) {
       data = data.statuses.map((cur) => {
         return cur.text
       })
-      data = data.join('').replace(/[\W]/g, " ")
-      console.log('data: ', data)
+      data = data.join('').replace(/[\W#]/g, " ")
       var parameters = {
         extract: 'entities,keywords,doc-emotion,feeds,relations,concepts',
         sentiment: 1,
@@ -78,7 +72,6 @@ exports.watson = function(cb) {
         if (err)
           console.log('error:', err);
         else
-          console.log(JSON.stringify(response, null, 2));
           cb(null, response)
       });
       }catch(e) {
@@ -103,34 +96,38 @@ exports.watson = function(cb) {
 //   }
 // )
 
-exports.twitterMap = (cb) => {
-  client.stream('statuses/filter', {track: 'luke christopher', filter_level:'low', locations: '-118.9448, 32.8007, -117.6462, 34.8233', language: 'en'},  function(stream) {       
-        fs.readFile(searchData, (err, buffer) => {
-        if(err) return cb(err);
-          try {
-            var data = JSON.parse(buffer);
-            stream.on('data', function(tweet) {
-              counter++;
-              console.log('counter: ', counter)
-              if(counter >= countLimit){
-                let json = JSON.stringify(data)
-                stream.destroy('data');
-                fs.writeFile(searchData, json, (err) => {
-                if(err) return cb(err);
-                return cb(null, data);
-                })  
-              }
-              data.push(tweet.text)  
-            });
-              
-          } catch (e) {
-          var data = [];
-          }
-        })
-    stream.on('error', function(error) {
-      console.log(error);
+
+var string = 'javascript',
+    antiString = 'shitty song, wack, sucks, suck, bad, music, terrible',
+    counter = 0,
+    countLimit = 200,
+    tweetStrs = [],
+    tweetObjs = [];
+
+exports.twitterMap = (req,res,cb) => {
+  let term = decodeURIComponent(req.query.term)
+  console.log('term: ', term)
+  client.stream('statuses/filter', {track: term, filter_level:'low', locations: '-122.75,36.8,-121.75,37.8', language: 'en'},  function(stream) {       
+        console.log('hit route')
+        // if(err) return cb(err);
+    
+    stream.on('data', function(tweet) {
+      counter++
+      console.log('counter: ', counter)
+      res.socketEmitter('twitter', tweet.text)
+        if(counter > countLimit){
+          counter = 0
+          stream.destroy('data')
+        }
     });
-  });   
+    
+        
+    stream.on('error', function(error) {
+      console.log(error)
+      stream.destroy('data')
+    });
+  });
+  // cb(null, "Streaming Success")   
 }
 
 

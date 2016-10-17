@@ -12,6 +12,8 @@ let perm = {
   "":true
 }
 
+let _stream = []
+
 
 
 class DataStore extends EventEmitter {
@@ -21,9 +23,11 @@ class DataStore extends EventEmitter {
       switch(action.type) {
         case 'DATA_OBJ_RECEIVED':
         let { twitter, wordFreq, watson, wordObj } = action.payload.dataObj
+        console.log('cur.document_tone.cur.document_tone.cur.document_tone. ', wordFreq)
         _frequency = wordObj
         _twitterData = twitter
-        _wordFreq = this.permWordFreq(wordFreq);
+        // _wordFreq = this.permWordFreq(wordFreq);
+        _wordFreq = wordFreq.filter(cur => cur[0] == "#") 
         _watson = watson
         this.emit('CHANGE')
         break
@@ -32,6 +36,27 @@ class DataStore extends EventEmitter {
           perm = action.payload[1]
           _wordFreq = this.trainWordFreq(_wordFreq)
           console.log(_wordFreq)
+        this.emit('CHANGE')
+        break
+        case 'TWEET_STREAM':
+          _stream.unshift(action.payload)
+          // _stream.forEach((cur) => {
+            
+            action.payload.split(' ').forEach((cur2) => {
+              if(cur2[0] == "#" && cur2[1] !== " "){
+                console.log('CUR 2: ', cur2)
+                console.log('FREQUENCY: ', _frequency[cur2])
+                if(_frequency[cur2]) {
+                      _frequency[cur2] += 1
+                    }else {
+                      _frequency[cur2] = 1
+                    }
+                if(_wordFreq.indexOf(cur2) == -1){
+                  _wordFreq.push(cur2)  
+                }
+              }
+            // })
+          })
         this.emit('CHANGE')
         break
       }
@@ -48,6 +73,7 @@ class DataStore extends EventEmitter {
   permWordFreq(wordFreq){
     return wordFreq.filter((cur) => {
       if(!perm[cur]){
+
         return true
       }
     })
@@ -74,6 +100,10 @@ class DataStore extends EventEmitter {
 
   getWatson(){
     return _watson
+  }
+
+  getStream(){
+    return _stream
   }
 
 }

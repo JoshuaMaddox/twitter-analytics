@@ -6,6 +6,12 @@ const ServerActions = {
       type: 'DATA_OBJ_RECEIVED',
       payload: { dataObj }
     }) 
+  },
+  incomingTweets(data){
+    AppDispatcher.dispatch({
+      type:'TWEET_STREAM',
+      payload: data
+    })
   }
 }
 
